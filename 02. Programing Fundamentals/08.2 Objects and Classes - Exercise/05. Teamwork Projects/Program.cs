@@ -15,78 +15,57 @@ namespace _05._Teamwork_Projects
             {
                 string[] teamDetails = Console.ReadLine()
                     .Split("-", StringSplitOptions.RemoveEmptyEntries);
+
                 string creator = teamDetails[0];
                 string teamName = teamDetails[1];
+
                 Team newTeam = new Team(creator, teamName);
-                bool isNewTeamOrCreator = true;
 
-                foreach (Team team in teams)
+                if (teams.Any(t => t.TeamName == newTeam.TeamName))
                 {
-                    if (team.TeamName == newTeam.TeamName)
-                    {
-                        isNewTeamOrCreator = false;
-                        Console.WriteLine($"Team {newTeam.TeamName} was already created!");
-                        break;
-                    }
+                    Console.WriteLine($"Team {newTeam.TeamName} was already created!");
+                    continue;
                 }
 
-                if (isNewTeamOrCreator)
+                if (teams.Any(t => t.Creator == newTeam.Creator))
                 {
-                    foreach (Team team in teams)
-                    {
-                        if (team.Creator == newTeam.Creator)
-                        {
-                            isNewTeamOrCreator = false;
-                            Console.WriteLine($"{newTeam.Creator} cannot create another team!");
-                            break;
-                        }
-                    }
+                    Console.WriteLine($"{newTeam.Creator} cannot create another team!");
+                    continue;
                 }
 
-                if (isNewTeamOrCreator)
-                {
-                    teams.Add(newTeam);
-                    Console.WriteLine($"Team {teamName} has been created by {creator}!");
-                }
+                teams.Add(newTeam);
+                Console.WriteLine($"Team {teamName} has been created by {creator}!");
             }
 
             string assignment = Console.ReadLine();
+
             while (assignment != "end of assignment")
             {
                 string[] assignmentDetails = assignment
                     .Split("->", StringSplitOptions.RemoveEmptyEntries);
+
                 string newMember = assignmentDetails[0];
                 string teamToJoin = assignmentDetails[1];
 
-                bool isTeamExist = false;
-
-                foreach (Team currTeam in teams)
+                if (teams.Any(t => t.TeamName == teamToJoin))
                 {
-                    if (currTeam.TeamName == teamToJoin)
+                    if (teams.Any(t => t.Members.Contains(newMember) || t.Creator == newMember))
                     {
-                        isTeamExist = true;
-                        bool isMemberExist = false;
+                        Console.WriteLine($"Member {newMember} cannot join team {teamToJoin}!");
+                        assignment = Console.ReadLine();
+                        continue;
+                    }
 
-                        foreach (Team otherTeam in teams)
+                    foreach (Team team in teams)
+                    {
+                        if (team.TeamName == teamToJoin)
                         {
-                            if (otherTeam.Members.Contains(newMember)
-                                || newMember == otherTeam.Creator)
-                            {
-                                isMemberExist = true;
-                                Console.WriteLine
-                                    ($"Member {newMember} cannot join team {teamToJoin}!");
-                                break;
-                            }
-                        }
-
-                        if (!isMemberExist)
-                        {
-                            currTeam.Members.Add(newMember);
+                            team.Members.Add(newMember);
+                            break;
                         }
                     }
                 }
-
-                if (!isTeamExist)
+                else
                 {
                     Console.WriteLine($"Team {teamToJoin} does not exist!");
                 }
@@ -107,6 +86,7 @@ namespace _05._Teamwork_Projects
                 {
                     Console.WriteLine(currTeam.TeamName);
                     Console.WriteLine($"- {currTeam.Creator}");
+
                     foreach (string member in currTeam.Members.OrderBy(x => x))
                     {
                         Console.WriteLine($"-- {member}");
