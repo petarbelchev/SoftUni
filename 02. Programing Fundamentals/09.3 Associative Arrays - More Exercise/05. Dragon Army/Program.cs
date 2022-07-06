@@ -68,35 +68,10 @@ namespace _05._Dragon_Army
     {
         public DragonStats(string damage, string health, string armor)
         {
-            if (damage == "null")
-            {
-                Damage = 45;
-            }
-            else
-            {
-                Damage = int.Parse(damage);
-            }
-
-            if (health == "null")
-            {
-                Health = 250;
-            }
-            else
-            {
-                Health = int.Parse(health);
-            }
-
-            if (armor == "null")
-            {
-                Armor = 10;
-            }
-            else
-            {
-                Armor = int.Parse(armor);
-            }
+            Damage = damage == "null" ? 45 : Damage = int.Parse(damage);
+            Health = health == "null" ? 250 : Health = int.Parse(health);
+            Armor = armor == "null" ? 10 : Armor = int.Parse(armor);
         }
-
-        public string Name { get; set; }
         public int Damage { get; set; }
         public int Health { get; set; }
         public int Armor { get; set; }
