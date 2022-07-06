@@ -42,19 +42,11 @@ namespace _05._Dragon_Army
 
             foreach (var type in dragons)
             {
-                int dragonsCount = type.Value.Keys.Count();
-                double sumDamage = 0;
-                double sumHealth = 0;
-                double sumArmor = 0;
+                double avDamage = type.Value.Select(x => x.Value.Damage).Average();
+                double avHealth = type.Value.Select(x => x.Value.Health).Average();
+                double avArmor = type.Value.Select(x => x.Value.Armor).Average();
 
-                foreach (var dragon in type.Value)
-                {
-                    sumDamage += dragon.Value.Damage;
-                    sumHealth += dragon.Value.Health;
-                    sumArmor += dragon.Value.Armor;
-                }
-
-                Console.WriteLine($"{type.Key}::({sumDamage / dragonsCount:f2}/{sumHealth / dragonsCount:f2}/{sumArmor / dragonsCount:f2})");
+                Console.WriteLine($"{type.Key}::({avDamage:f2}/{avHealth:f2}/{avArmor:f2})");
 
                 foreach (var dragon in type.Value.OrderBy(name => name.Key))
                 {
