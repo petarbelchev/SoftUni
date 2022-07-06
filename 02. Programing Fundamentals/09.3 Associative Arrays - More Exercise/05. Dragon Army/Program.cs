@@ -31,7 +31,7 @@ namespace _05._Dragon_Army
                 {
                     if (dragons[newDragonType].Keys.Contains(newDragonName))
                     {
-                        dragons[newDragonType][newDragonName] = new DragonStats(dragonDetails[2], dragonDetails[3], dragonDetails[4]);
+                        dragons[newDragonType][newDragonName] = newDragonStats;
                     }
                     else
                     {
