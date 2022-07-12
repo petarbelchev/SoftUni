@@ -9,13 +9,13 @@ namespace _03._Match_Dates
         {
             string dates = Console.ReadLine();
 
-            Regex regex = new Regex(@"\b(\d{2})([-\.\/])([A-Z][a-z]{2})\2(\d{4})\b");
+            Regex regex = new Regex(@"\b(?<day>\d{2})(-|\.|\/)(?<month>[A-Z][a-z]{2})\1(?<year>\d{4})\b");
 
             MatchCollection matchedDates = regex.Matches(dates);
 
             foreach (Match date in matchedDates)
             {
-                Console.WriteLine($"Day: {date.Groups[1]}, Month: {date.Groups[3]}, Year: {date.Groups[4]}");
+                Console.WriteLine($"Day: {date.Groups["day"]}, Month: {date.Groups["month"]}, Year: {date.Groups["year"]}");
             }
         }
     }
