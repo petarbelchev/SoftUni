@@ -3,11 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32616.157
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "01. World Tour", "01. World Tour\01. World Tour.csproj", "{DCE36132-FA85-46C1-8480-4EE8207FAC43}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "01. World Tour", "01. World Tour\01. World Tour.csproj", "{DCE36132-FA85-46C1-8480-4EE8207FAC43}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "02. Fancy Barcodes", "02. Fancy Barcodes\02. Fancy Barcodes.csproj", "{16A79B35-1795-4B7D-AB16-F09AFF69CCC5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "02. Fancy Barcodes", "02. Fancy Barcodes\02. Fancy Barcodes.csproj", "{16A79B35-1795-4B7D-AB16-F09AFF69CCC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "03. The Pianist", "03. The Pianist\03. The Pianist.csproj", "{58ACB812-ACEB-48D0-84E4-77E840348107}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "03. The Pianist", "03. The Pianist\03. The Pianist.csproj", "{58ACB812-ACEB-48D0-84E4-77E840348107}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "04. Activation Keys", "04. Activation Keys\04. Activation Keys.csproj", "{6C771FA7-13C0-42B0-985D-8FB353C4BD48}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "05. Emoji Detector", "05. Emoji Detector\05. Emoji Detector.csproj", "{726019C6-B6F3-4F07-840C-D1A76F5313F6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "06. Heroes of Code and Logic VII", "06. Heroes of Code and Logic VII\06. Heroes of Code and Logic VII.csproj", "{79E196B3-FE1E-43D7-AA7C-3EFB4EA45F4E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +33,18 @@ Global
 		{58ACB812-ACEB-48D0-84E4-77E840348107}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58ACB812-ACEB-48D0-84E4-77E840348107}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58ACB812-ACEB-48D0-84E4-77E840348107}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C771FA7-13C0-42B0-985D-8FB353C4BD48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C771FA7-13C0-42B0-985D-8FB353C4BD48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C771FA7-13C0-42B0-985D-8FB353C4BD48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C771FA7-13C0-42B0-985D-8FB353C4BD48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{726019C6-B6F3-4F07-840C-D1A76F5313F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{726019C6-B6F3-4F07-840C-D1A76F5313F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{726019C6-B6F3-4F07-840C-D1A76F5313F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{726019C6-B6F3-4F07-840C-D1A76F5313F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79E196B3-FE1E-43D7-AA7C-3EFB4EA45F4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79E196B3-FE1E-43D7-AA7C-3EFB4EA45F4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79E196B3-FE1E-43D7-AA7C-3EFB4EA45F4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79E196B3-FE1E-43D7-AA7C-3EFB4EA45F4E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
