@@ -1,2 +1,2 @@
-# SoftUni
-Еverything I do while studying at SoftUni
+# C# Projects
+Еverything I do on C# and .NET while studying at SoftUni
