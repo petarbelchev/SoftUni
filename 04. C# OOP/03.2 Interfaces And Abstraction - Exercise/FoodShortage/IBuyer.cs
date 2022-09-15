@@ -2,9 +2,9 @@
 {
     public interface IBuyer
     {
-        public string Name { get; set; }
-        public int Age { get; set; }
-        public int Food { get; set; }
+        public string Name { get; }
+        public int Age { get; }
+        public int Food { get; }
         public void BuyFood();
     }
 }
