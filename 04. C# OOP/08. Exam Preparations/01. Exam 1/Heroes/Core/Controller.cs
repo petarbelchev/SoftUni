@@ -48,7 +48,7 @@ namespace Heroes.Core
             if (heroType == null)
                 throw new InvalidOperationException("Invalid hero type.");
 
-            if (/*heroes.Models.Any(m => m.Name == name)*/ this.heroes.FindByName(name) != null)
+            if (this.heroes.FindByName(name) != null)
                 throw new InvalidOperationException($"The hero {name} already exists.");
             try
             {
@@ -73,7 +73,7 @@ namespace Heroes.Core
             if (weaponType == null)
                 throw new InvalidOperationException("Invalid weapon type.");
 
-            if (/*weapons.Models.Any(m => m.Name == name)*/ this.weapons.FindByName(name) != null)
+            if (this.weapons.FindByName(name) != null)
                 throw new InvalidOperationException($"The weapon {name} already exists.");
 
             try
