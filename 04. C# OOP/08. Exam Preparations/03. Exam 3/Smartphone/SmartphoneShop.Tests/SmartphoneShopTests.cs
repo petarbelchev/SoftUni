@@ -108,6 +108,7 @@ namespace SmartphoneShop.Tests
         {
             Shop shop = new Shop(1);
             Smartphone smartPhone = new Smartphone("phone1", 100);
+            shop.Add(smartPhone);
 
             Assert.Throws<InvalidOperationException>(() =>
             {
@@ -124,17 +125,6 @@ namespace SmartphoneShop.Tests
             shop.TestPhone("phone1", 30);
 
             Assert.AreEqual(smartPhone.CurrentBateryCharge, smartPhone.MaximumBatteryCharge - 30);
-        }
-
-        [Test]
-        public void Test_TestPhoneWhenPhoneBatteryUsageIsEqual()
-        {
-            Shop shop = new Shop(1);
-            Smartphone smartPhone = new Smartphone("phone1", 100);
-            shop.Add(smartPhone);
-            shop.TestPhone("phone1", 100);
-
-            Assert.AreEqual(smartPhone.CurrentBateryCharge, smartPhone.MaximumBatteryCharge - 100);
         }
 
         [TestCase("")]
