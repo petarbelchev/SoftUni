@@ -6,10 +6,8 @@
     using NavalVessels.Repositories;
     using NavalVessels.Repositories.Contracts;
     using NavalVessels.Utilities.Messages;
-    using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
 
     public class Controller : IController
     {
@@ -25,10 +23,12 @@
         public string AssignCaptain(string selectedCaptainName, string selectedVesselName)
         {
             ICaptain captain = this.captains.FirstOrDefault(c => c.FullName == selectedCaptainName);
+
             if (captain == null)
                 return string.Format(OutputMessages.CaptainNotFound, selectedCaptainName);
 
             IVessel vessel = this.vessels.FindByName(selectedVesselName);
+
             if (vessel == null)
                 return string.Format(OutputMessages.VesselNotFound, selectedVesselName);
 
@@ -69,29 +69,35 @@
         public string CaptainReport(string captainFullName)
         {
             var captain = this.captains.FirstOrDefault(c => c.FullName == captainFullName);
+            
+            if (captain == null)
+                return string.Format(OutputMessages.CaptainNotFound, captainFullName);
+
             return captain.Report();
         }
 
         public string HireCaptain(string fullName)
         {
-            Captain captain = new Captain(fullName);
-
-            if (this.captains.Contains(captain))
+            var captain = this.captains.FirstOrDefault(c => c.FullName == fullName);
+            if (captain != null)
                 return string.Format(OutputMessages.CaptainIsAlreadyHired, fullName);
 
+            captain = new Captain(fullName);
             this.captains.Add(captain);
+
             return string.Format(OutputMessages.SuccessfullyAddedCaptain, fullName);
         }
 
         public string ProduceVessel(string name, string vesselType, double mainWeaponCaliber, double speed)
         {
+            IVessel vessel = this.vessels.FindByName(name);
+            
+            if (vessel != null)
+                return string.Format(OutputMessages.VesselIsAlreadyManufactured, vesselType, name);
+
             if (vesselType != "Battleship" && vesselType != "Submarine")
                 return string.Format(OutputMessages.InvalidVesselType);
 
-            if (this.vessels.FindByName(name) != null)
-                return string.Format(OutputMessages.VesselIsAlreadyManufactured, vesselType, name);
-
-            IVessel vessel;
             if (vesselType == "Battleship")
                 vessel = new Battleship(name, mainWeaponCaliber, speed);
             else
@@ -136,6 +142,10 @@
         public string VesselReport(string vesselName)
         {
             var vessel = this.vessels.FindByName(vesselName);
+
+            if (vessel == null)
+                return string.Format(OutputMessages.VesselNotFound, vesselName);
+
             return vessel.ToString();
         }
     }

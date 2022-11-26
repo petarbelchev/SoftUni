@@ -20,7 +20,7 @@
             this.initialArmourThickness = armorThickness;
             this.MainWeaponCaliber = mainWeaponCaliber;
             this.Speed = speed;
-            this.Targets = new List<string>();
+            this.Targets = new HashSet<string>();
         }
 
         public string Name
