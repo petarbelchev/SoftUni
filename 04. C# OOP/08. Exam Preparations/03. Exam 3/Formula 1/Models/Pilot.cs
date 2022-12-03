@@ -13,6 +13,7 @@ namespace Formula1.Models
         {
             FullName= fullName;
             CanRace = false;
+            NumberOfWins = 0;
         }
 
         public string FullName
@@ -27,7 +28,17 @@ namespace Formula1.Models
             }
         }
 
-        public IFormulaOneCar Car { get => car; }
+        public IFormulaOneCar Car 
+        { 
+            get => car;
+            private set
+            {
+                if (value == null)
+                    throw new NullReferenceException(ExceptionMessages.InvalidCarForPilot);
+
+                car = value;
+            }
+        }
 
         public int NumberOfWins { get; private set; }
 
@@ -35,10 +46,7 @@ namespace Formula1.Models
 
         public void AddCar(IFormulaOneCar car)
         {
-            if (car == null)
-                throw new NullReferenceException(ExceptionMessages.InvalidCarForPilot);
-
-            this.car = car;
+            Car = car;
             CanRace = true;
         }
 
@@ -46,6 +54,6 @@ namespace Formula1.Models
             => NumberOfWins++;
 
         public override string ToString()
-            => $"Pilot {this.fullName} has {this.NumberOfWins} wins.";
+            => $"Pilot {this.FullName} has {this.NumberOfWins} wins.";
     }
 }

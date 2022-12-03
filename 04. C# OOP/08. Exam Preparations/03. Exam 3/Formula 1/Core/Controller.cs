@@ -28,12 +28,12 @@
         {
             IPilot pilot = pilotRepository.FindByName(pilotName);
 
-            if (pilot == null || pilot.CanRace == true)
+            if (pilot == default || pilot.Car != null)
                 throw new InvalidOperationException(string.Format(ExceptionMessages.PilotDoesNotExistOrHasCarErrorMessage, pilotName));
 
             IFormulaOneCar car = carRepository.FindByName(carModel);
 
-            if (car == null)
+            if (car == default)
                 throw new NullReferenceException(string.Format(ExceptionMessages.CarDoesNotExistErrorMessage, carModel));
 
             pilot.AddCar(car);
@@ -46,12 +46,12 @@
         {
             IRace race = raceRepository.FindByName(raceName);
 
-            if (race == null)
+            if (race == default)
                 throw new NullReferenceException(string.Format(ExceptionMessages.RaceDoesNotExistErrorMessage, raceName));
 
             IPilot pilot = pilotRepository.FindByName(pilotFullName);
 
-            if (pilot == null || pilot.CanRace == false || race.Pilots.Any(p => p.FullName == pilotFullName))
+            if (pilot == default || pilot.CanRace == false || race.Pilots.Any(p => p.FullName == pilotFullName))
                 throw new InvalidOperationException(string.Format(ExceptionMessages.PilotDoesNotExistErrorMessage, pilotFullName));
 
             race.Pilots.Add(pilot);
@@ -63,12 +63,12 @@
         {
             IFormulaOneCar car = carRepository.FindByName(model);
 
-            if (car != null)
+            if (car != default)
                 throw new InvalidOperationException(string.Format(ExceptionMessages.CarExistErrorMessage, model));
 
-            if (type == "Ferrari")
+            if (type == nameof(Ferrari))
                 car = new Ferrari(model, horsepower, engineDisplacement);
-            else if (type == "Williams")
+            else if (type == nameof(Williams))
                 car = new Williams(model, horsepower, engineDisplacement);
             else
                 throw new InvalidOperationException(string.Format(ExceptionMessages.InvalidTypeCar, type));
@@ -82,7 +82,7 @@
         {
             IPilot pilot = pilotRepository.FindByName(fullName);
 
-            if (pilot != null)
+            if (pilot != default)
                 throw new InvalidOperationException(string.Format(ExceptionMessages.PilotExistErrorMessage, fullName));
 
             pilot = new Pilot(fullName);
@@ -95,7 +95,7 @@
         {
             IRace race = raceRepository.FindByName(raceName);
 
-            if (race != null)
+            if (race != default)
                 throw new InvalidOperationException(string.Format(ExceptionMessages.RaceExistErrorMessage, raceName));
 
             race = new Race(raceName, numberOfLaps);
@@ -132,7 +132,7 @@
         {
             IRace race = raceRepository.FindByName(raceName);
 
-            if (race == null)
+            if (race == default)
                 throw new NullReferenceException(string.Format(ExceptionMessages.RaceDoesNotExistErrorMessage, raceName));
 
             if (race.Pilots.Count < 3)
@@ -142,7 +142,11 @@
                 throw new InvalidOperationException(string.Format(ExceptionMessages.RaceTookPlaceErrorMessage, raceName));
 
 
-            var firstThreePilots = race.Pilots.OrderByDescending(p => p.Car.RaceScoreCalculator(race.NumberOfLaps)).Take(3).ToArray();
+            var firstThreePilots = race.Pilots
+                .OrderByDescending(p => p.Car.RaceScoreCalculator(race.NumberOfLaps))
+                .Take(3)
+                .ToArray();
+
             race.TookPlace = true;
             firstThreePilots[0].WinRace();
 

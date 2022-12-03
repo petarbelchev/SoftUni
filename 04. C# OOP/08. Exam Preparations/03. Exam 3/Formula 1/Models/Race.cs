@@ -10,14 +10,13 @@ namespace Formula1.Models
     {
         private string raceName;
         private int numberOfLabs;
-        private readonly ICollection<IPilot> pilots;
 
         public Race(string raceName, int numberOfLaps)
         {
             RaceName = raceName;
             NumberOfLaps = numberOfLaps;
             TookPlace = false;
-            pilots = new List<IPilot>();
+            Pilots = new List<IPilot>();
         }
 
         public string RaceName
@@ -26,7 +25,7 @@ namespace Formula1.Models
             private set
             {
                 if (string.IsNullOrWhiteSpace(value) || value.Length < 5)
-                    throw new ArgumentException(string.Format(ExceptionMessages.InvalidRaceName, raceName));
+                    throw new ArgumentException(string.Format(ExceptionMessages.InvalidRaceName, value));
 
                 raceName = value;
             }
@@ -46,10 +45,10 @@ namespace Formula1.Models
 
         public bool TookPlace { get; set; }
 
-        public ICollection<IPilot> Pilots { get => this.pilots; }
+        public ICollection<IPilot> Pilots { get; private set; }
 
         public void AddPilot(IPilot pilot)
-            => pilots.Add(pilot);
+            => Pilots.Add(pilot);
 
         public string RaceInfo()
         {
