@@ -11,7 +11,7 @@ namespace Gym.Repositories
 
         public EquipmentRepository()
         {
-            models = new List<IEquipment>();
+            models = new HashSet<IEquipment>();
         }
 
         public IReadOnlyCollection<IEquipment> Models 

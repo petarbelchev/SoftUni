@@ -8,6 +8,7 @@ namespace Gym.Models.Athletes
     {
         private string fullName;
         private string motivation;
+        private int stamina;
         private int numberOfMedals;
 
         protected Athlete(string fullName, string motivation, int numberOfMedals, int stamina)
@@ -46,7 +47,19 @@ namespace Gym.Models.Athletes
             }
         }
 
-        public int Stamina { get; protected set; }
+        public int Stamina
+        {
+            get => stamina;
+            protected set
+            {
+                if (value > 100)
+                {
+                    stamina = 100;
+                    throw new ArgumentException(ExceptionMessages.InvalidStamina);
+                }
+                stamina = value;
+            }
+        }
 
         public int NumberOfMedals
         {

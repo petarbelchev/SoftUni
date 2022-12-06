@@ -16,12 +16,6 @@ namespace Gym.Models.Athletes
         public override void Exercise()
         {
             this.Stamina += StaminaChange;
-
-            if (this.Stamina > 100)
-            {
-                this.Stamina = 100;
-                throw new ArgumentException(ExceptionMessages.InvalidStamina);
-            }
         }
     }
 }
