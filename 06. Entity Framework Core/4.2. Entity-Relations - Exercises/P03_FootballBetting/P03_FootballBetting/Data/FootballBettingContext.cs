@@ -26,7 +26,7 @@ namespace P03_FootballBetting.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
-                optionsBuilder.UseSqlServer(@"Server=AS3\SQLEXPRESS;Database=FootballBetting;Integrated Security=True;");
+                optionsBuilder.UseSqlServer(@"Server=.;Database=FootballBetting;Integrated Security=True;");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
