@@ -1,0 +1,3 @@
+Product 1: Cheese - 7lv
+Product 2: Ham - 5.5lv
+Product 3: Bread - 1.5lv
