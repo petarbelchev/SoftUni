@@ -1,17 +1,16 @@
-﻿using ForumApp.Data;
-using ForumApp.Data.Models;
-using ForumApp.Models;
+﻿using ForumApp.Core.Contracts;
+using ForumApp.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ForumApp.Controllers
 {
 	public class PostsController : Controller
 	{
-		private readonly ForumAppDbContext context;
+		private readonly IPostService service;
 
-		public PostsController(ForumAppDbContext context)
+		public PostsController(IPostService postService)
 		{
-			this.context = context;
+			this.service = postService;
 		}
 
 		public IActionResult Index()
@@ -19,17 +18,9 @@ namespace ForumApp.Controllers
 			return RedirectToAction(nameof(All));
 		}
 
-		public IActionResult All()
+		public async Task<IActionResult> All()
 		{
-			PostViewModel[] posts = context.Posts
-				.Select(p => new PostViewModel
-				{
-					Id = p.Id,
-					Title= p.Title,
-					Content = p.Content
-				}).ToArray();
-
-			return View(posts);
+			return View(await service.GetAllPosts());
 		}
 
 		public IActionResult Add()
@@ -38,56 +29,30 @@ namespace ForumApp.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult Add(PostFormModel model)
+		public async Task<IActionResult> Add(PostFormModel model)
 		{
-			Post newPost = new Post
-			{
-				Title = model.Title,
-				Content = model.Content
-			};
-
-			context.Posts.Add(newPost);
-			context.SaveChanges();
+			await service.AddPost(model);
 
 			return RedirectToAction(nameof(All));
 		}
 
-		public IActionResult Edit(int id)
+		public async Task<IActionResult> Edit(int id)
 		{
-			Post post = context.Posts.Find(id) ?? 
-				throw new ArgumentNullException($"Post with id {id} doesn't exist!");
-
-			PostFormModel postFormModel = new PostFormModel
-			{
-				Title = post.Title,
-				Content = post.Content
-			};
-
-			return View(postFormModel);
+			return View(await service.GetPostById(id));
 		}
 
 		[HttpPost]
-		public IActionResult Edit(int id, PostFormModel model)
+		public async Task<IActionResult> Edit(int id, PostFormModel model)
 		{
-			Post editedPost = context.Posts.Find(id) ?? 
-				throw new ArgumentNullException($"Post with id {id} doesn't exist!");
-
-			editedPost.Title = model.Title;
-			editedPost.Content = model.Content;
-
-			context.SaveChanges();
+			await service.EditPost(id, model);
 
 			return RedirectToAction(nameof(All));
 		}
 
 		[HttpPost]
-		public IActionResult Delete(int id)
+		public async Task<IActionResult> Delete(int id)
 		{
-			Post post = context.Posts.Find(id) ??
-				throw new ArgumentNullException($"Post with id {id} doesn't exist!");
-
-			context.Remove(post);
-			context.SaveChanges();
+			await service.DeletePostById(id);
 
 			return RedirectToAction(nameof(All));
 		}

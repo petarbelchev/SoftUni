@@ -14,7 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ForumApp.Core\ForumApp.Core.csproj" />
     <ProjectReference Include="..\ForumApp.Data\ForumApp.Data.csproj" />
+    <ProjectReference Include="..\ForumApp.Models\ForumApp.Models.csproj" />
   </ItemGroup>
 
 </Project>

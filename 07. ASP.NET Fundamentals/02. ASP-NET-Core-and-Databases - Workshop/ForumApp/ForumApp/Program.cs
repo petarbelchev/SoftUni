@@ -1,4 +1,8 @@
+using ForumApp.Core.Contracts;
+using ForumApp.Core.Services;
 using ForumApp.Data;
+using ForumApp.Data.Repositories;
+using ForumApp.Data.Repositories.Contracts;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +15,9 @@ builder.Services.AddDbContext<ForumAppDbContext>(options =>
 {
 	options.UseSqlServer(connectionString);
 });
+
+builder.Services.AddScoped<IPostRepository, PostRepository>();
+builder.Services.AddScoped<IPostService, PostService>();
 
 var app = builder.Build();
 

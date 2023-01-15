@@ -15,4 +15,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ForumApp.Models\ForumApp.Models.csproj" />
+  </ItemGroup>
+
 </Project>
