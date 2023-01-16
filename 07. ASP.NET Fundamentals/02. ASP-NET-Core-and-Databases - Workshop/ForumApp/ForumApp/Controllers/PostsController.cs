@@ -31,6 +31,9 @@ namespace ForumApp.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Add(PostFormModel model)
 		{
+			if (!ModelState.IsValid)
+				return View(model);
+
 			await service.AddPost(model);
 
 			return RedirectToAction(nameof(All));
@@ -44,6 +47,9 @@ namespace ForumApp.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Edit(int id, PostFormModel model)
 		{
+			if (!ModelState.IsValid)
+				return View(model);
+
 			await service.EditPost(id, model);
 
 			return RedirectToAction(nameof(All));
