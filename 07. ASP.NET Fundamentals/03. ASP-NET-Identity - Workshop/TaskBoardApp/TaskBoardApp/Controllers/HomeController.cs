@@ -42,7 +42,7 @@ namespace TaskBoardApp.Controllers
             var homeModel = new HomeViewModel()
             {
                 AllTasksCount = _dbContext.Tasks.Count(),
-                BoardsWithTasksCount= boardsWithTasksCount,
+                BoardsWithTasksCount = boardsWithTasksCount,
                 UserTasksCount = userTasksCount
             };
 

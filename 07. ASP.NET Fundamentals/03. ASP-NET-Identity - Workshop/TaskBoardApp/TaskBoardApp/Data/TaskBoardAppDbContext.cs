@@ -11,7 +11,7 @@ namespace TaskBoardApp.Data
 			: base(options)
 		{ }
 
-		public DbSet<Entities.TaskEntity> Tasks { get; set; } = null!;
+		public DbSet<TaskEntity> Tasks { get; set; } = null!;
 
 		public DbSet<Board> Boards { get; set; } = null!;
 
@@ -32,9 +32,9 @@ namespace TaskBoardApp.Data
 			builder.Entity<Board>()
 				.HasData(OpenBoard, InProgressBoard, DoneBoard);
 
-			builder.Entity<Entities.TaskEntity>()
+			builder.Entity<TaskEntity>()
 				.HasData(
-				new Entities.TaskEntity
+				new TaskEntity
 				{
 					Id = 1,
 					Title = "Prepare for ASP.NET Fundamentals exam",
@@ -43,7 +43,7 @@ namespace TaskBoardApp.Data
 					OwnerId = GuestUser.Id,
 					BoardId = OpenBoard.Id
 				},
-				new Entities.TaskEntity
+				new TaskEntity
 				{
 					Id = 2,
 					Title = "Improve EF Core skills",
@@ -52,7 +52,7 @@ namespace TaskBoardApp.Data
 					OwnerId = GuestUser.Id,
 					BoardId = DoneBoard.Id
 				},
-				new Entities.TaskEntity
+				new TaskEntity
 				{
 					Id = 3,
 					Title = "Improve ASP.NET Core skills",
@@ -61,7 +61,7 @@ namespace TaskBoardApp.Data
 					OwnerId = GuestUser.Id,
 					BoardId = InProgressBoard.Id
 				},
-				new Entities.TaskEntity
+				new TaskEntity
 				{
 					Id = 4,
 					Title = "Prepare for C# Fundamentals Exam",
