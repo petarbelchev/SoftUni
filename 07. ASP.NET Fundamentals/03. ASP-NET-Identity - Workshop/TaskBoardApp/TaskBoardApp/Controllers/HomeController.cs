@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TaskBoardApp.Data;
 using TaskBoardApp.Models;
 
 namespace TaskBoardApp.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly TaskBoardAppDbContext _dbContext;
 
@@ -14,6 +15,7 @@ namespace TaskBoardApp.Controllers
             _dbContext = context;
         }
 
+        [AllowAnonymous]
         public IActionResult Index()
         {
             var boardsNames = _dbContext.Boards
@@ -35,7 +37,7 @@ namespace TaskBoardApp.Controllers
 
             if (User.Identity?.IsAuthenticated ?? false)
             {
-                var currUserId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var currUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 userTasksCount = _dbContext.Tasks.Count(t => t.OwnerId == currUserId);
             }
 

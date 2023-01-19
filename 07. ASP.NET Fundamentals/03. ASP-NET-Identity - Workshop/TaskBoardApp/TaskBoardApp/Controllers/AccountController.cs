@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using TaskBoardApp.Data.Entities;
 using TaskBoardApp.Models.Account;
 
 namespace TaskBoardApp.Controllers
 {
-	public class AccountController : Controller
+	public class AccountController : BaseController
 	{
 		private readonly UserManager<User> userManager;
 		private readonly SignInManager<User> signInManager;
@@ -18,6 +19,7 @@ namespace TaskBoardApp.Controllers
 			this.signInManager = signInManager;
 		}
 
+		[AllowAnonymous]
 		public IActionResult Index()
 		{
 			if (User.Identity?.IsAuthenticated ?? false)
@@ -26,6 +28,7 @@ namespace TaskBoardApp.Controllers
 				return RedirectToAction("Login");
 		}
 
+		[AllowAnonymous]
 		[HttpGet]
 		public IActionResult Register()
 		{
@@ -34,6 +37,7 @@ namespace TaskBoardApp.Controllers
 			return View(model);
 		}
 
+		[AllowAnonymous]
 		[HttpPost]
 		public async Task<IActionResult> Register(RegisterViewModel model)
 		{
@@ -63,14 +67,19 @@ namespace TaskBoardApp.Controllers
 			return View(model);
 		}
 
+		[AllowAnonymous]
 		[HttpGet]
-		public IActionResult Login()
+		public IActionResult Login(string? returnUrl = null)
 		{
 			LoginViewModel model = new LoginViewModel();
+
+			if (returnUrl != null)
+				model.ReturnUrl = returnUrl;
 
 			return View(model);
 		}
 
+		[AllowAnonymous]
 		[HttpPost]
 		public async Task<IActionResult> Login(LoginViewModel model)
 		{
@@ -82,7 +91,12 @@ namespace TaskBoardApp.Controllers
 			var result = await signInManager.PasswordSignInAsync(model.Username, model.Password, true, false);
 
 			if (result.Succeeded)
+			{
+				if (model.ReturnUrl != null)
+					return Redirect(model.ReturnUrl);
+
 				return RedirectToAction("Index", "Home");
+			}
 
 			ModelState.AddModelError("", "Invalid login!");
 

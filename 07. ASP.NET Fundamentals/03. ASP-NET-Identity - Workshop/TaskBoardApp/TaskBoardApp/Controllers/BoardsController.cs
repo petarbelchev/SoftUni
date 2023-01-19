@@ -6,7 +6,7 @@ using TaskBoardApp.Models.Tasks;
 
 namespace TaskBoardApp.Controllers
 {
-    public class BoardsController : Controller
+    public class BoardsController : BaseController
     {
         private readonly TaskBoardAppDbContext _dbContext;
 

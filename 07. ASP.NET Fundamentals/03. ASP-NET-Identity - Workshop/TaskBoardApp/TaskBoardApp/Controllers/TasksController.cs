@@ -7,7 +7,7 @@ using TaskBoardApp.Models.Tasks;
 
 namespace TaskBoardApp.Controllers
 {
-    public class TasksController : Controller
+    public class TasksController : BaseController
     {
         private readonly TaskBoardAppDbContext _dbContext;
 
