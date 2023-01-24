@@ -1,26 +1,156 @@
 ﻿using HouseRentingSystem.Data;
+using HouseRentingSystem.Data.Entities;
+using HouseRentingSystem.Models;
+using HouseRentingSystem.Services.Houses.Models;
 using HouseRentingSystem.Services.Models;
 
 namespace HouseRentingSystem.Services.Houses
 {
-	public class HouseService : IHouseService
-	{
-		private readonly HouseRentingDbContext data;
+    public class HouseService : IHouseService
+    {
+        private readonly HouseRentingDbContext data;
 
-		public HouseService(HouseRentingDbContext context)
-			=> data = context;
+        public HouseService(HouseRentingDbContext context)
+            => data = context;
 
-		public IEnumerable<HouseIndexServiceModel> LastThreeHouses()
-		{
-			return data.Houses
-				.OrderByDescending(h => h.Id)
-				.Take(3)
-				.Select(h => new HouseIndexServiceModel
-				{
-					Id = h.Id,
-					Title= h.Title,
-					ImageUrl = h.ImageUrl
-				});
-		}
-	}
+        public HouseQueryServiceModel All(string? categoryName = null, string? searchTerm = null,
+                                            HouseSorting sorting = HouseSorting.Newest,
+                                            int currentPage = 1, int housesPerPage = 1)
+        {
+            var housesQuery = data.Houses.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(categoryName))
+            {
+                housesQuery = housesQuery
+                    .Where(h => h.Category.Name == categoryName);
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                string searchTermToLower = searchTerm.ToLower();
+
+                housesQuery = housesQuery.Where(h =>
+                    h.Title.ToLower().Contains(searchTermToLower) ||
+                    h.Address.ToLower().Contains(searchTermToLower) ||
+                    h.Description.ToLower().Contains(searchTermToLower));
+            }
+
+            housesQuery = sorting switch
+            {
+                HouseSorting.Price => housesQuery
+                    .OrderBy(h => h.PricePerMonth),
+                HouseSorting.NotRentedFirst => housesQuery
+                    .OrderBy(h => h.RenterId != null)
+                    .ThenByDescending(h => h.Id),
+                _ => housesQuery.OrderByDescending(h => h.Id)
+            };
+
+            var houses = housesQuery
+                .Skip((currentPage - 1) * housesPerPage)
+                .Take(housesPerPage)
+                .Select(h => new HouseServiceModel
+                {
+                    Id = h.Id,
+                    Title = h.Title,
+                    Address = h.Address,
+                    ImageUrl = h.ImageUrl,
+                    PricePerMonth = h.PricePerMonth,
+                    IsRented = h.RenterId != null
+                })
+                .ToList();
+
+            return new HouseQueryServiceModel
+            {
+                Houses = houses,
+                TotalHousesCount = houses.Count,
+            };
+        }
+
+        public IEnumerable<HouseCategoryServiceModel> AllCategories()
+        {
+            return data.Categories
+                .Select(c => new HouseCategoryServiceModel
+                {
+                    Id = c.Id,
+                    Name = c.Name
+                });
+        }
+
+        public IEnumerable<string> AllCategoriesNames()
+            => data.Categories
+                .Select(c => c.Name)
+                .Distinct()
+                .ToList();
+
+        public IEnumerable<HouseServiceModel> AllHousesByAgentId(int agentId)
+        {
+            var houses = data.Houses
+                .Where(h => h.AgentId == agentId)
+                .ToList();
+
+            return ProjectToModel(houses);
+        }
+
+        public IEnumerable<HouseServiceModel> AllHousesByUserId(string userId)
+        {
+            var houses = data.Houses
+                .Where(h => h.RenterId == userId)
+                .ToList();
+
+            return ProjectToModel(houses);
+        }
+
+        public bool CategoryExists(int categoryId)
+            => data.Categories.Any(c => c.Id == categoryId);
+
+        public int Create(string title, string address, string description,
+            string imageUrl, decimal price, int categoryId, int agentId)
+        {
+            var newHouse = new House()
+            {
+                Title = title,
+                Address = address,
+                Description = description,
+                ImageUrl = imageUrl,
+                PricePerMonth = price,
+                CategoryId = categoryId,
+                AgentId = agentId
+            };
+
+            data.Houses.Add(newHouse);
+            data.SaveChanges();
+
+            return newHouse.Id;
+        }
+
+        public IEnumerable<HouseIndexServiceModel> LastThreeHouses()
+        {
+            return data.Houses
+                .OrderByDescending(h => h.Id)
+                .Take(3)
+                .Select(h => new HouseIndexServiceModel
+                {
+                    Id = h.Id,
+                    Title = h.Title,
+                    ImageUrl = h.ImageUrl
+                });
+        }
+
+        private List<HouseServiceModel> ProjectToModel(List<House> houses)
+        {
+            var retultHouses = houses
+                .Select(h => new HouseServiceModel
+                {
+                    Id = h.Id,
+                    Title = h.Title,
+                    Address = h.Address,
+                    ImageUrl = h.ImageUrl,
+                    PricePerMonth = h.PricePerMonth,
+                    IsRented = h.RenterId != null
+                })
+                .ToList();
+
+            return retultHouses;
+        }
+    }
 }

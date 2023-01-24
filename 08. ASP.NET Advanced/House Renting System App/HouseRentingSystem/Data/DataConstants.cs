@@ -18,8 +18,8 @@
             public const int HouseDescriptionMaxLength = 500;
             public const int HouseDescriptionMinLength = 50;
 
-            public const decimal HousePricePerMonthMaxValue = 2000M;
-            public const decimal HousePricePerMonthMinValue = 0M;
+            public const double HousePricePerMonthMaxValue = 2000.00;
+            public const double HousePricePerMonthMinValue = 0.00;
         }
 
         public class Agent
