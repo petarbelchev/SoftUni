@@ -23,10 +23,10 @@ namespace HouseRentingSystem.Controllers
         public IActionResult All([FromQuery] AllHousesQueryModel queryModel)
         {
             var queryResult = houseService.All(
-                queryModel.Category, 
-                queryModel.SearchTerm, 
-                queryModel.Sorting, 
-                queryModel.CurrentPage, 
+                queryModel.Category,
+                queryModel.SearchTerm,
+                queryModel.Sorting,
+                queryModel.CurrentPage,
                 AllHousesQueryModel.HousesPerPage);
 
             queryModel.TotalHousesCount = queryResult.TotalHousesCount;
@@ -37,7 +37,14 @@ namespace HouseRentingSystem.Controllers
         }
 
         public IActionResult Details(int id)
-            => View(new HouseDetailsViewModel());
+        {
+            if (!houseService.Exists(id))
+                return BadRequest();
+
+            var houseModel = houseService.HouseDetailsById(id);
+
+            return View(houseModel);
+        }
 
         [Authorize]
         public IActionResult Add()
@@ -98,41 +105,130 @@ namespace HouseRentingSystem.Controllers
         [Authorize]
         public IActionResult Edit(int id)
         {
-            return View(new HouseFormModel());
+            if (!houseService.Exists(id))
+                return BadRequest();
+
+            if (!houseService.HasAgentWithId(id, User.Id()))
+                return Unauthorized();
+
+            var house = houseService.HouseDetailsById(id);
+            var houseCategoryId = houseService.GetHouseCategoryId(id);
+
+            return View(new HouseFormModel()
+            {
+                Title = house.Title,
+                Address = house.Address,
+                Description = house.Description,
+                PricePerMonth = house.PricePerMonth,
+                ImageUrl = house.ImageUrl,
+                CategoryId = houseCategoryId,
+                Categories = houseService.AllCategories(),
+            });
         }
 
         [Authorize]
         [HttpPost]
-        public IActionResult Edit(HouseFormModel model)
+        public IActionResult Edit(int id, HouseFormModel model)
         {
-            return RedirectToAction(nameof(Details), new { id = 1 });
+            if (!houseService.Exists(id))
+                return BadRequest();
+
+            if (!houseService.HasAgentWithId(id, User.Id()))
+                return Unauthorized();
+            
+            if (!houseService.CategoryExists(model.CategoryId))
+                ModelState.AddModelError(nameof(model.CategoryId),
+                    "Category does not exist.");
+
+            if (!ModelState.IsValid)
+            {
+                model.Categories = houseService.AllCategories();
+
+                return View(model);
+            }
+
+            houseService.Edit(id, model.Title, model.Address, model.Description,
+                              model.ImageUrl, model.PricePerMonth, model.CategoryId);
+
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         [Authorize]
         public IActionResult Delete(int id)
         {
-            return View(new HouseDetailsViewModel());
+            if (!houseService.Exists(id))
+                return BadRequest();
+
+            if (!houseService.HasAgentWithId(id, User.Id()))
+                return Unauthorized();
+
+            var house = houseService.HouseDetailsById(id);
+
+            return View(new HouseDetailsViewModel()
+            {
+                Id = house.Id,
+                Title = house.Title,
+                Address = house.Address,
+                ImageUrl = house.ImageUrl
+            });
         }
 
         [Authorize]
         [HttpPost]
         public IActionResult Delete(HouseDetailsViewModel model)
         {
+            if (!houseService.Exists(model.Id))
+                return BadRequest();
+
+            if (!houseService.HasAgentWithId(model.Id, User.Id()))
+                return Unauthorized();
+
+            houseService.Delete(model.Id);
+
             return RedirectToAction(nameof(All));
         }
 
-        //[Authorize]
-        //[HttpPost]
-        //public IActionResult Rent(int id)
-        //{
-        //	return RedirectToAction(nameof(Mine));
-        //}
+        [Authorize]
+        [HttpPost]
+        public IActionResult Rent(int id)
+        {
+            if (!houseService.Exists(id))
+                return BadRequest();
 
-        //[Authorize]
-        //[HttpPost]
-        //public IActionResult Leave(int id)
-        //{
-        //	return RedirectToAction(nameof(Mine));
-        //}
+            string userId = User.Id();
+
+            if (agentService.ExistsById(userId))
+                return Unauthorized();
+
+            if (houseService.IsRented(id))
+                return BadRequest();
+
+            houseService.Rent(id, userId);
+
+            return RedirectToAction(nameof(Mine));
+        }
+
+        [Authorize]
+        [HttpPost]
+        public IActionResult Leave(int id)
+        {
+            if (!houseService.Exists(id) ||
+                !houseService.IsRented(id))
+            {
+                return BadRequest();
+            }
+
+            string userId = User.Id();
+
+            if (agentService.ExistsById(userId) ||
+                !houseService.IsRentedByUserWithId(id, userId))
+            {
+                return Unauthorized();
+            }
+
+            houseService.Leave(id);
+
+            return RedirectToAction(nameof(Mine));
+        }
     }
 }
