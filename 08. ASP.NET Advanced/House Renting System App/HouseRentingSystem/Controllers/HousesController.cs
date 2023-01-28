@@ -2,6 +2,7 @@
 using HouseRentingSystem.Models.Houses;
 using HouseRentingSystem.Services.Agents;
 using HouseRentingSystem.Services.Houses;
+using HouseRentingSystem.Services.Houses.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,7 +23,7 @@ namespace HouseRentingSystem.Controllers
 
         public IActionResult All([FromQuery] AllHousesQueryModel queryModel)
         {
-            var queryResult = houseService.All(
+            HouseQueryServiceModel queryResult = houseService.All(
                 queryModel.Category,
                 queryModel.SearchTerm,
                 queryModel.Sorting,
@@ -36,12 +37,15 @@ namespace HouseRentingSystem.Controllers
             return View(queryModel);
         }
 
-        public IActionResult Details(int id)
+        public IActionResult Details(int id, string information)
         {
             if (!houseService.Exists(id))
                 return BadRequest();
 
             var houseModel = houseService.HouseDetailsById(id);
+
+            if (information != houseModel.GetInformation())
+                return BadRequest();
 
             return View(houseModel);
         }
@@ -84,7 +88,8 @@ namespace HouseRentingSystem.Controllers
                 model.Description, model.ImageUrl, model.PricePerMonth,
                 model.CategoryId, agentId);
 
-            return RedirectToAction(nameof(Details), new { id = newHouseId });
+            return RedirectToAction(nameof(Details), 
+                new { id = newHouseId, information = model.GetInformation() });
         }
 
         [Authorize]
@@ -135,7 +140,7 @@ namespace HouseRentingSystem.Controllers
 
             if (!houseService.HasAgentWithId(id, User.Id()))
                 return Unauthorized();
-            
+
             if (!houseService.CategoryExists(model.CategoryId))
                 ModelState.AddModelError(nameof(model.CategoryId),
                     "Category does not exist.");
@@ -150,7 +155,8 @@ namespace HouseRentingSystem.Controllers
             houseService.Edit(id, model.Title, model.Address, model.Description,
                               model.ImageUrl, model.PricePerMonth, model.CategoryId);
 
-            return RedirectToAction(nameof(Details), new { id });
+            return RedirectToAction(nameof(Details), 
+                new { id, information = model.GetInformation() });
         }
 
         [Authorize]
