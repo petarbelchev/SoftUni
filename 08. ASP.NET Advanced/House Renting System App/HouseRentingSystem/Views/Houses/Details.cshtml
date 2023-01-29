@@ -29,14 +29,15 @@
 			<p>Category: <b>@Model.Category</b></p>
 			<p><i>(@(Model.IsRented ? "Rented" : "Not Rented"))</i></p>
 			<div class="form-inline">
-				@if (this.User.Identity?.IsAuthenticated ?? false)
+				@if (User.Identity?.IsAuthenticated ?? false)
 				{
-					@if (houseService.HasAgentWithId(Model.Id, User.Id()))
+					@if (houseService.HasAgentWithId(Model.Id, User.Id()) || User.IsAdmin())
 					{
 						<a class="btn btn-warning" asp-controller="Houses" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
 						<a class="ml-2 btn btn-danger" asp-controller="Houses" asp-action="Delete" asp-route-id="@Model.Id">Delete</a>
 					}
-					else if (agentService.ExistsById(User.Id()))
+					
+					@if (!agentService.ExistsById(User.Id()) || User.IsAdmin())
 					{
 						@if (!Model.IsRented)
 						{
@@ -57,7 +58,7 @@
 			<div class="card" style="width: 18rem;">
 				<div class="card-body">
 					<h5 class="card-title">Agent Info</h5>
-					<p class="card-text">Full Name:  @userService.UserFullName(User.Id())</p>
+					<p class="card-text">Full Name:  @Model.Agent.FullName</p>
 					<p class="card-text">Email:  @Model.Agent.Email</p>
 					<p class="card-text">Phone Number: @Model.Agent.PhoneNumber</p>
 				</div>

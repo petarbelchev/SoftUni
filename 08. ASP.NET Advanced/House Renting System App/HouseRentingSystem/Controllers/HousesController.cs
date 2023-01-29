@@ -8,233 +8,242 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HouseRentingSystem.Controllers
 {
-    public class HousesController : Controller
-    {
-        private readonly IHouseService houseService;
-        private readonly IAgentService agentService;
+	public class HousesController : Controller
+	{
+		private readonly IHouseService houseService;
+		private readonly IAgentService agentService;
 
-        public HousesController(
-            IHouseService houseService,
-            IAgentService agentService)
-        {
-            this.houseService = houseService;
-            this.agentService = agentService;
-        }
+		public HousesController(
+			IHouseService houseService,
+			IAgentService agentService)
+		{
+			this.houseService = houseService;
+			this.agentService = agentService;
+		}
 
-        public IActionResult All([FromQuery] AllHousesQueryModel queryModel)
-        {
-            HouseQueryServiceModel queryResult = houseService.All(
-                queryModel.Category,
-                queryModel.SearchTerm,
-                queryModel.Sorting,
-                queryModel.CurrentPage,
-                AllHousesQueryModel.HousesPerPage);
+		public IActionResult All([FromQuery] AllHousesQueryModel queryModel)
+		{
+			HouseQueryServiceModel queryResult = houseService.All(
+				queryModel.Category,
+				queryModel.SearchTerm,
+				queryModel.Sorting,
+				queryModel.CurrentPage,
+				AllHousesQueryModel.HousesPerPage);
 
-            queryModel.TotalHousesCount = queryResult.TotalHousesCount;
-            queryModel.Houses = queryResult.Houses;
-            queryModel.Categories = houseService.AllCategoriesNames();
+			queryModel.TotalHousesCount = queryResult.TotalHousesCount;
+			queryModel.Houses = queryResult.Houses;
+			queryModel.Categories = houseService.AllCategoriesNames();
 
-            return View(queryModel);
-        }
+			return View(queryModel);
+		}
 
-        public IActionResult Details(int id, string information)
-        {
-            if (!houseService.Exists(id))
-                return BadRequest();
+		public IActionResult Details(int id, string information)
+		{
+			if (!houseService.Exists(id))
+				return BadRequest();
 
-            var houseModel = houseService.HouseDetailsById(id);
+			var houseModel = houseService.HouseDetailsById(id);
 
-            if (information != houseModel.GetInformation())
-                return BadRequest();
+			if (information != houseModel.GetInformation())
+				return BadRequest();
 
-            return View(houseModel);
-        }
+			return View(houseModel);
+		}
 
-        [Authorize]
-        public IActionResult Add()
-        {
-            if (!agentService.ExistsById(User.Id()))
-                return RedirectToAction("Become", "Agents");
+		[Authorize]
+		public IActionResult Add()
+		{
+			if (!agentService.ExistsById(User.Id()))
+				return RedirectToAction("Become", "Agents");
 
-            var form = new HouseFormModel()
-            {
-                Categories = houseService.AllCategories()
-            };
+			var form = new HouseFormModel()
+			{
+				Categories = houseService.AllCategories()
+			};
 
-            return View(form);
-        }
+			return View(form);
+		}
 
-        [Authorize]
-        [HttpPost]
-        public IActionResult Add(HouseFormModel model)
-        {
-            if (!agentService.ExistsById(User.Id()))
-                return RedirectToAction("Become", "Agents");
+		[Authorize]
+		[HttpPost]
+		public IActionResult Add(HouseFormModel model)
+		{
+			if (!agentService.ExistsById(User.Id()))
+				return RedirectToAction("Become", "Agents");
 
-            if (!houseService.CategoryExists(model.CategoryId))
-                ModelState.AddModelError(nameof(model.CategoryId),
-                    "Category does not exist.");
+			if (!houseService.CategoryExists(model.CategoryId))
+				ModelState.AddModelError(nameof(model.CategoryId),
+					"Category does not exist.");
 
-            if (!ModelState.IsValid)
-            {
-                model.Categories = houseService.AllCategories();
+			if (!ModelState.IsValid)
+			{
+				model.Categories = houseService.AllCategories();
 
-                return View(model);
-            }
+				return View(model);
+			}
 
-            int agentId = agentService.GetAgentId(User.Id());
+			int agentId = agentService.GetAgentId(User.Id());
 
-            int newHouseId = houseService.Create(model.Title, model.Address,
-                model.Description, model.ImageUrl, model.PricePerMonth,
-                model.CategoryId, agentId);
+			int newHouseId = houseService.Create(model.Title, model.Address,
+				model.Description, model.ImageUrl, model.PricePerMonth,
+				model.CategoryId, agentId);
 
-            return RedirectToAction(nameof(Details), 
-                new { id = newHouseId, information = model.GetInformation() });
-        }
+			return RedirectToAction(nameof(Details),
+				new { id = newHouseId, information = model.GetInformation() });
+		}
 
-        [Authorize]
-        public IActionResult Mine()
-        {
-            string userId = User.Id();
+		[Authorize]
+		public IActionResult Mine()
+		{
+			var userHouses = new List<HouseServiceModel>();
+			string userId = User.Id();
+			bool isAgent = agentService.ExistsById(userId);
 
-            if (agentService.ExistsById(userId))
-            {
-                int agentId = agentService.GetAgentId(userId);
+			if (isAgent)
+			{
+				int agentId = agentService.GetAgentId(userId);
+				userHouses.AddRange(houseService.AllHousesByAgentId(agentId));
+			}
 
-                return View(houseService.AllHousesByAgentId(agentId));
-            }
+			if (!isAgent || User.IsAdmin())
+			{
+				int[] addedHousesIds = userHouses.Select(h => h.Id).ToArray();
 
-            return View(houseService.AllHousesByUserId(userId));
-        }
+				userHouses.AddRange(houseService.AllHousesByUserId(userId)
+					.Where(h => !addedHousesIds.Contains(h.Id)));
+			}
 
-        [Authorize]
-        public IActionResult Edit(int id)
-        {
-            if (!houseService.Exists(id))
-                return BadRequest();
+			return View(userHouses);
+		}
 
-            if (!houseService.HasAgentWithId(id, User.Id()))
-                return Unauthorized();
+		[Authorize]
+		public IActionResult Edit(int id)
+		{
+			if (!houseService.Exists(id))
+				return BadRequest();
 
-            var house = houseService.HouseDetailsById(id);
-            var houseCategoryId = houseService.GetHouseCategoryId(id);
+			if (!houseService.HasAgentWithId(id, User.Id()) && !User.IsAdmin())
+				return Unauthorized();
 
-            return View(new HouseFormModel()
-            {
-                Title = house.Title,
-                Address = house.Address,
-                Description = house.Description,
-                PricePerMonth = house.PricePerMonth,
-                ImageUrl = house.ImageUrl,
-                CategoryId = houseCategoryId,
-                Categories = houseService.AllCategories(),
-            });
-        }
+			var house = houseService.HouseDetailsById(id);
+			var houseCategoryId = houseService.GetHouseCategoryId(id);
 
-        [Authorize]
-        [HttpPost]
-        public IActionResult Edit(int id, HouseFormModel model)
-        {
-            if (!houseService.Exists(id))
-                return BadRequest();
+			return View(new HouseFormModel()
+			{
+				Title = house.Title,
+				Address = house.Address,
+				Description = house.Description,
+				PricePerMonth = house.PricePerMonth,
+				ImageUrl = house.ImageUrl,
+				CategoryId = houseCategoryId,
+				Categories = houseService.AllCategories(),
+			});
+		}
 
-            if (!houseService.HasAgentWithId(id, User.Id()))
-                return Unauthorized();
+		[Authorize]
+		[HttpPost]
+		public IActionResult Edit(int id, HouseFormModel model)
+		{
+			if (!houseService.Exists(id))
+				return BadRequest();
 
-            if (!houseService.CategoryExists(model.CategoryId))
-                ModelState.AddModelError(nameof(model.CategoryId),
-                    "Category does not exist.");
+			if (!houseService.HasAgentWithId(id, User.Id()) && !User.IsAdmin())
+				return Unauthorized();
 
-            if (!ModelState.IsValid)
-            {
-                model.Categories = houseService.AllCategories();
+			if (!houseService.CategoryExists(model.CategoryId))
+				ModelState.AddModelError(nameof(model.CategoryId),
+					"Category does not exist.");
 
-                return View(model);
-            }
+			if (!ModelState.IsValid)
+			{
+				model.Categories = houseService.AllCategories();
 
-            houseService.Edit(id, model.Title, model.Address, model.Description,
-                              model.ImageUrl, model.PricePerMonth, model.CategoryId);
+				return View(model);
+			}
 
-            return RedirectToAction(nameof(Details), 
-                new { id, information = model.GetInformation() });
-        }
+			houseService.Edit(id, model.Title, model.Address, model.Description,
+							  model.ImageUrl, model.PricePerMonth, model.CategoryId);
 
-        [Authorize]
-        public IActionResult Delete(int id)
-        {
-            if (!houseService.Exists(id))
-                return BadRequest();
+			return RedirectToAction(nameof(Details),
+				new { id, information = model.GetInformation() });
+		}
 
-            if (!houseService.HasAgentWithId(id, User.Id()))
-                return Unauthorized();
+		[Authorize]
+		public IActionResult Delete(int id)
+		{
+			if (!houseService.Exists(id))
+				return BadRequest();
 
-            var house = houseService.HouseDetailsById(id);
+			if (!houseService.HasAgentWithId(id, User.Id()) && !User.IsAdmin())
+				return Unauthorized();
 
-            return View(new HouseDetailsViewModel()
-            {
-                Id = house.Id,
-                Title = house.Title,
-                Address = house.Address,
-                ImageUrl = house.ImageUrl
-            });
-        }
+			var house = houseService.HouseDetailsById(id);
 
-        [Authorize]
-        [HttpPost]
-        public IActionResult Delete(HouseDetailsViewModel model)
-        {
-            if (!houseService.Exists(model.Id))
-                return BadRequest();
+			return View(new HouseDetailsViewModel()
+			{
+				Id = house.Id,
+				Title = house.Title,
+				Address = house.Address,
+				ImageUrl = house.ImageUrl
+			});
+		}
 
-            if (!houseService.HasAgentWithId(model.Id, User.Id()))
-                return Unauthorized();
+		[Authorize]
+		[HttpPost]
+		public IActionResult Delete(HouseDetailsViewModel model)
+		{
+			if (!houseService.Exists(model.Id))
+				return BadRequest();
 
-            houseService.Delete(model.Id);
+			if (!houseService.HasAgentWithId(model.Id, User.Id()) && !User.IsAdmin())
+				return Unauthorized();
 
-            return RedirectToAction(nameof(All));
-        }
+			houseService.Delete(model.Id);
 
-        [Authorize]
-        [HttpPost]
-        public IActionResult Rent(int id)
-        {
-            if (!houseService.Exists(id))
-                return BadRequest();
+			return RedirectToAction(nameof(All));
+		}
 
-            string userId = User.Id();
+		[Authorize]
+		[HttpPost]
+		public IActionResult Rent(int id)
+		{
+			if (!houseService.Exists(id))
+				return BadRequest();
 
-            if (agentService.ExistsById(userId))
-                return Unauthorized();
+			string userId = User.Id();
 
-            if (houseService.IsRented(id))
-                return BadRequest();
+			if (agentService.ExistsById(userId) && !User.IsAdmin())
+				return Unauthorized();
 
-            houseService.Rent(id, userId);
+			if (houseService.IsRented(id))
+				return BadRequest();
 
-            return RedirectToAction(nameof(Mine));
-        }
+			houseService.Rent(id, userId);
 
-        [Authorize]
-        [HttpPost]
-        public IActionResult Leave(int id)
-        {
-            if (!houseService.Exists(id) ||
-                !houseService.IsRented(id))
-            {
-                return BadRequest();
-            }
+			return RedirectToAction(nameof(Mine));
+		}
 
-            string userId = User.Id();
+		[Authorize]
+		[HttpPost]
+		public IActionResult Leave(int id)
+		{
+			if (!houseService.Exists(id) ||
+				!houseService.IsRented(id))
+			{
+				return BadRequest();
+			}
 
-            if (agentService.ExistsById(userId) ||
-                !houseService.IsRentedByUserWithId(id, userId))
-            {
-                return Unauthorized();
-            }
+			string userId = User.Id();
 
-            houseService.Leave(id);
+			if ((agentService.ExistsById(userId) && !User.IsAdmin()) ||
+				!houseService.IsRentedByUserWithId(id, userId))
+			{
+				return Unauthorized();
+			}
 
-            return RedirectToAction(nameof(Mine));
-        }
-    }
+			houseService.Leave(id);
+
+			return RedirectToAction(nameof(Mine));
+		}
+	}
 }

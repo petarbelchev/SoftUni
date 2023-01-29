@@ -26,7 +26,7 @@ namespace HouseRentingSystem.Services.Agents
             => data.Agents.Any(a => a.UserId == userId);
 
         public int GetAgentId(string userId)
-            => data.Agents.FirstOrDefault(a => a.UserId == userId).Id;
+            => data.Agents.First(a => a.UserId == userId).Id;
 
         public bool UserHasRents(string userId)
             => data.Houses.Any(h => h.RenterId== userId);

@@ -19,15 +19,16 @@
 			<a asp-controller="Houses" asp-action="Details" asp-route-id="@Model.Id"
 			   asp-route-information="@Model.GetInformation()"
 			   class="btn btn-success">Details</a>
-			@if (this.User.Identity?.IsAuthenticated ?? false)
+			@if (User.Identity?.IsAuthenticated ?? false)
 			{
-				@if (houses.HasAgentWithId(Model.Id, User.Id()))
+				@if (houses.HasAgentWithId(Model.Id, User.Id()) || User.IsAdmin())
 				{
 					<a asp-controller="Houses" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
 					<a asp-controller="Houses" asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
 					<p></p>
 				}
-				else if (!agents.ExistsById(User.Id()))
+
+				@if (!agents.ExistsById(User.Id()) || User.IsAdmin())
 				{
 					@if (!Model.IsRented)
 					{
