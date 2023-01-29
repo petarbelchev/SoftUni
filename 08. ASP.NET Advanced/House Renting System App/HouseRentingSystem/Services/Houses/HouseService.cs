@@ -4,15 +4,22 @@ using HouseRentingSystem.Models;
 using HouseRentingSystem.Services.Agents.Models;
 using HouseRentingSystem.Services.Houses.Models;
 using HouseRentingSystem.Services.Models;
+using HouseRentingSystem.Services.Users;
 
 namespace HouseRentingSystem.Services.Houses
 {
     public class HouseService : IHouseService
     {
         private readonly HouseRentingDbContext data;
+        private readonly IUserService userService;
 
-        public HouseService(HouseRentingDbContext context)
-            => data = context;
+        public HouseService(
+            HouseRentingDbContext context,
+            IUserService userService)
+        {
+            this.data = context;
+            this.userService = userService;
+        }
 
         public HouseQueryServiceModel All(string? categoryName = null, string? searchTerm = null,
                                             HouseSorting sorting = HouseSorting.Newest,
@@ -192,6 +199,7 @@ namespace HouseRentingSystem.Services.Houses
                     IsRented = h.RenterId != null,
                     Agent = new AgentServiceModel
                     {
+                        FullName = userService.UserFullName(h.Agent.UserId),
                         Email = h.Agent.User.Email,
                         PhoneNumber = h.Agent.PhoneNumber
                     }

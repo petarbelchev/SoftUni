@@ -4,6 +4,7 @@ using HouseRentingSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HouseRentingSystem.Data.Migrations
 {
     [DbContext(typeof(HouseRentingDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230129083312_AddedUserColumns")]
+    partial class AddedUserColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,12 +53,6 @@ namespace HouseRentingSystem.Data.Migrations
                             Id = 1,
                             PhoneNumber = "+359888888888",
                             UserId = "dea12856-c198-4129-b3f3-b893d8395082"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            PhoneNumber = "+359123456789",
-                            UserId = "bcb4f072-ecca-43c9-ab26-c060c6f364e4"
                         });
                 });
 
@@ -258,7 +254,7 @@ namespace HouseRentingSystem.Data.Migrations
                         {
                             Id = "dea12856-c198-4129-b3f3-b893d8395082",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "2ba52961-3842-43c0-8a52-71718010215d",
+                            ConcurrencyStamp = "d7d55db7-1ba6-4ed2-b4a9-00099c526b12",
                             Email = "agent@mail.com",
                             EmailConfirmed = false,
                             FirstName = "Linda",
@@ -266,9 +262,9 @@ namespace HouseRentingSystem.Data.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "agent@mail.com",
                             NormalizedUserName = "agent@mail.com",
-                            PasswordHash = "AQAAAAEAACcQAAAAEJNZMa1D4xq6HH7DEIf1SNHkpgwoUXs+ZOEYBGX1Y+JTbY/lZ/Lv1aQY5BejAQATPg==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEFqYrLZy/6KCQ7l6AsGNvQVy2ehJly3TjwGpH4AIbj0jk2ww0WweWmVDt10aHMonZw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "d4c46de0-e697-4b8d-b689-ccec63c460d5",
+                            SecurityStamp = "1cd5b557-66ed-40e8-98ea-b9d9ca50b788",
                             TwoFactorEnabled = false,
                             UserName = "agent@mail.com"
                         },
@@ -276,37 +272,19 @@ namespace HouseRentingSystem.Data.Migrations
                         {
                             Id = "6d5800ce-d726-4fc8-83d9-d6b3ac1f591e",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "1e4eb7aa-c44c-4a9f-a24b-dedd98053ebc",
+                            ConcurrencyStamp = "2e6231ab-d1ba-4f4d-ad4c-ed00a9dfd905",
                             Email = "guest@mail.com",
                             EmailConfirmed = false,
                             FirstName = "Teodor",
                             LastName = "Lesly",
                             LockoutEnabled = false,
-                            NormalizedEmail = "GUEST@MAIL.COM",
-                            NormalizedUserName = "GUEST@MAIL.COM",
-                            PasswordHash = "AQAAAAEAACcQAAAAEPWVIfcr17FrGeILyOngwujqt8pAG+0MsyYIsdAlQb8BUeWQl9CFZVADpJGR8hNLag==",
+                            NormalizedEmail = "guest@mail.com",
+                            NormalizedUserName = "guest@mail.com",
+                            PasswordHash = "AQAAAAEAACcQAAAAEH/uJXGdbm8HQlCVS6WHI1r4/KtD2rmYbGgvHnvODpGIRflQpvN3N8LjUFzjCDhRxA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "daf471dc-dc16-4a77-b661-cadcab8d1711",
+                            SecurityStamp = "c9703f6e-df2c-4f03-a8cd-79fd44c70921",
                             TwoFactorEnabled = false,
                             UserName = "guest@mail.com"
-                        },
-                        new
-                        {
-                            Id = "bcb4f072-ecca-43c9-ab26-c060c6f364e4",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "cd17e5a7-0a4a-45e1-8ee8-0802d3f9ef35",
-                            Email = "admin@mail.com",
-                            EmailConfirmed = false,
-                            FirstName = "Great",
-                            LastName = "Admin",
-                            LockoutEnabled = false,
-                            NormalizedEmail = "ADMIN@MAIL.COM",
-                            NormalizedUserName = "ADMIN@MAIL.COM",
-                            PasswordHash = "AQAAAAEAACcQAAAAEEnffTF5FeyiU7bqyezs6z/SSuNUPe6XAUibc84AA7ecVGLcyH7PYbfplv0GEP2nbw==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "2c6454e1-d7ab-42ef-a1f8-710936d439d1",
-                            TwoFactorEnabled = false,
-                            UserName = "admin@mail.com"
                         });
                 });
 
