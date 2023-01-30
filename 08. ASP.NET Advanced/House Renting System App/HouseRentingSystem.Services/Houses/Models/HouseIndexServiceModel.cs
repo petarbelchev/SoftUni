@@ -1,6 +1,4 @@
-﻿using HouseRentingSystem.Services.Houses.Models;
-
-namespace HouseRentingSystem.Services.Models
+﻿namespace HouseRentingSystem.Services.Houses.Models
 {
     public class HouseIndexServiceModel : IHouseModel
     {

@@ -4,7 +4,6 @@ using HouseRentingSystem.Services.Agents;
 using HouseRentingSystem.Services.Data;
 using HouseRentingSystem.Services.Data.Entities;
 using HouseRentingSystem.Services.Houses.Models;
-using HouseRentingSystem.Services.Models;
 using HouseRentingSystem.Services.Users;
 
 namespace HouseRentingSystem.Services.Houses
@@ -60,6 +59,8 @@ namespace HouseRentingSystem.Services.Houses
                 _ => housesQuery.OrderByDescending(h => h.Id)
             };
 
+            int allHousesCount = housesQuery.Count();
+
             var houses = housesQuery
                 .Skip((currentPage - 1) * housesPerPage)
                 .Take(housesPerPage)
@@ -69,7 +70,7 @@ namespace HouseRentingSystem.Services.Houses
             return new HouseQueryServiceModel
             {
                 Houses = houses,
-                TotalHousesCount = houses.Count,
+                TotalHousesCount = allHousesCount,
             };
         }
 

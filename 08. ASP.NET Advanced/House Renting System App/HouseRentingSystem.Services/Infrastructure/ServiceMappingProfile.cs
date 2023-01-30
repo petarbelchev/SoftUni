@@ -2,7 +2,6 @@
 using HouseRentingSystem.Services.Agents.Models;
 using HouseRentingSystem.Services.Data.Entities;
 using HouseRentingSystem.Services.Houses.Models;
-using HouseRentingSystem.Services.Models;
 
 namespace HouseRentingSystem.Services.Infrastructure
 {
