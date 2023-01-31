@@ -3,47 +3,47 @@
 namespace HouseRentingSystem.Services.Houses
 {
     public interface IHouseService
-	{
-		IEnumerable<HouseIndexServiceModel> LastThreeHouses();
+    {
+        HouseQueryServiceModel All(string? categoryName = null,
+                                    string? searchTerm = null,
+                                    HouseSorting sortingValue = HouseSorting.Newest,
+                                    int currentPage = 1,
+                                    int housesPerPage = 1);
 
-		IEnumerable<HouseCategoryServiceModel> AllCategories();
+        IEnumerable<HouseCategoryServiceModel> AllCategories();
 
-		HouseQueryServiceModel All(string? categoryName = null,
-									string? searchTerm = null,
-									HouseSorting sortingValue = HouseSorting.Newest,
-									int currentPage = 1,
-									int housesPerPage = 1);
+        IEnumerable<string> AllCategoriesNames();
 
-		IEnumerable<string> AllCategoriesNames();
+        IEnumerable<HouseServiceModel> AllHousesByAgentId(int agentId);
 
-		bool CategoryExists(int categoryId);
+        IEnumerable<HouseServiceModel> AllHousesByUserId(string userId);
 
-		bool Exists(int id);
+        bool CategoryExists(int categoryId);
 
-		bool HasAgentWithId(int houseId, string userId);
+        int Create(string title, string address, string description,
+                    string imageUrl, decimal price, int categoryId, int agentId);
 
-		int GetHouseCategoryId(int houseId);
+        void Delete(int houseId);
 
-		int Create(string title, string address, string description,
-					string imageUrl, decimal price, int categoryId, int agentId);
+        void Edit(int houseId, string title, string address, string description,
+                    string imageUrl, decimal price, int categoryId);
 
-		void Edit(int houseId, string title, string address, string description,
-					string imageUrl, decimal price, int categoryId);
+        bool Exists(int id);
 
-		IEnumerable<HouseServiceModel> AllHousesByAgentId(int agentId);
+        int GetHouseCategoryId(int houseId);
 
-		IEnumerable<HouseServiceModel> AllHousesByUserId(string userId);
+        bool HasAgentWithId(int houseId, string userId);
 
-		HouseDetailsServiceModel HouseDetailsById(int id);
+        HouseDetailsServiceModel HouseDetailsById(int id);
 
-		void Delete(int houseId);
+        bool IsRented(int houseId);
 
-		bool IsRented(int houseId);
+        bool IsRentedByUserWithId(int houseId, string userId);
 
-		bool IsRentedByUserWithId(int houseId, string userId);
+        IEnumerable<HouseIndexServiceModel> LastThreeHouses();
 
-		void Rent(int houseId, string userId);
+        void Leave(int houseId);
 
-		void Leave(int houseId);
-	}
+        void Rent(int houseId, string userId);
+    }
 }

@@ -2,14 +2,14 @@
 {
     public interface IAgentService
     {
+        void Create(string userId, string phoneNumber);
+
         bool ExistsById(string userId);
 
-        bool UserWithPhoneNumberExists(string phoneNumber);
+        int GetAgentId(string userId);
 
         bool UserHasRents(string userId);
 
-        void Create(string userId, string phoneNumber);
-
-        int GetAgentId(string userId);
+        bool UserWithPhoneNumberExists(string phoneNumber);
     }
 }

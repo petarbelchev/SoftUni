@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using HouseRentingSystem.Services.Agents;
 using HouseRentingSystem.Services.Data;
 using HouseRentingSystem.Services.Data.Entities;
 using HouseRentingSystem.Services.Houses.Models;
@@ -12,18 +11,15 @@ namespace HouseRentingSystem.Services.Houses
     {
         private readonly HouseRentingDbContext data;
         private readonly IUserService userService;
-        private readonly IAgentService agentService;
         private readonly IMapper mapper;
 
         public HouseService(
             HouseRentingDbContext context,
             IUserService userService,
-            IAgentService agentService,
             IMapper mapper)
         {
             this.data = context;
             this.userService = userService;
-            this.agentService = agentService;
             this.mapper = mapper;
         }
 
