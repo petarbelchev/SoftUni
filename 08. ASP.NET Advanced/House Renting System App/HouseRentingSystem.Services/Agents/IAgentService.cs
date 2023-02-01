@@ -8,8 +8,6 @@
 
         int GetAgentId(string userId);
 
-        bool UserHasRents(string userId);
-
-        bool UserWithPhoneNumberExists(string phoneNumber);
+        bool AgentWithPhoneNumberExists(string phoneNumber);
     }
 }

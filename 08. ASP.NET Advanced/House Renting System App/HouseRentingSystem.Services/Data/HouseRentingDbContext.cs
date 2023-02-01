@@ -7,9 +7,17 @@ namespace HouseRentingSystem.Services.Data
 {
 	public class HouseRentingDbContext : IdentityDbContext<User>
 	{
-		public HouseRentingDbContext(DbContextOptions<HouseRentingDbContext> options)
+		private bool seedDb;
+
+		public HouseRentingDbContext(DbContextOptions<HouseRentingDbContext> options, bool seed = true)
 			: base(options)
 		{
+			if (Database.IsRelational())
+				Database.Migrate();
+			else
+				Database.EnsureCreated();
+
+			seedDb = seed;
 		}
 
 		public DbSet<Agent> Agents { get; init; } = null!;
@@ -22,10 +30,25 @@ namespace HouseRentingSystem.Services.Data
 		{
 			base.OnModelCreating(builder);
 
-			builder.ApplyConfiguration(new UserEntityTypeConfiguration());
-			builder.ApplyConfiguration(new AgentEntityTypeConfiguration());
-			builder.ApplyConfiguration(new CategoryEntityTypeConfiguration());
-			builder.ApplyConfiguration(new HouseEntityTypeConfiguration());
+			builder.Entity<House>()
+				.HasOne(h => h.Category)
+				.WithMany(c => c.Houses)
+				.HasForeignKey(h => h.CategoryId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			builder.Entity<House>()
+				.HasOne(h => h.Agent)
+				.WithMany()
+				.HasForeignKey(h => h.AgentId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			if (seedDb)
+			{
+				builder.ApplyConfiguration(new UserEntityTypeConfiguration());
+				builder.ApplyConfiguration(new AgentEntityTypeConfiguration());
+				builder.ApplyConfiguration(new CategoryEntityTypeConfiguration());
+				builder.ApplyConfiguration(new HouseEntityTypeConfiguration());
+			}
 		}
 	}
 }

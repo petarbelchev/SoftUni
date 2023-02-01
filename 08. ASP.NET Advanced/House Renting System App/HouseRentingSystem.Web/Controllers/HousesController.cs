@@ -1,10 +1,12 @@
-﻿using HouseRentingSystem.Web.Infrastructure;
+﻿using AutoMapper;
 using HouseRentingSystem.Services.Agents;
 using HouseRentingSystem.Services.Houses;
 using HouseRentingSystem.Services.Houses.Models;
+using HouseRentingSystem.Web.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using AutoMapper;
+using Microsoft.Extensions.Caching.Memory;
+using static HouseRentingSystem.Services.Data.DataConstants.AdminConstants;
 
 namespace HouseRentingSystem.Web.Controllers
 {
@@ -13,15 +15,18 @@ namespace HouseRentingSystem.Web.Controllers
 		private readonly IHouseService houseService;
 		private readonly IAgentService agentService;
 		private readonly IMapper mapper;
+		private readonly IMemoryCache cache;
 
 		public HousesController(
 			IHouseService houseService,
 			IAgentService agentService,
-			IMapper mapper)
+			IMapper mapper,
+			IMemoryCache cache)
 		{
 			this.houseService = houseService;
 			this.agentService = agentService;
 			this.mapper = mapper;
+			this.cache = cache;
 		}
 
 		public IActionResult All([FromQuery] AllHousesQueryModel queryModel)
@@ -91,6 +96,8 @@ namespace HouseRentingSystem.Web.Controllers
 				model.Description, model.ImageUrl, model.PricePerMonth,
 				model.CategoryId, agentId);
 
+			TempData["message"] = "You have sussessfully added a house!";
+
 			return RedirectToAction(nameof(Details),
 				new { id = newHouseId, information = model.GetInformation() });
 		}
@@ -98,25 +105,18 @@ namespace HouseRentingSystem.Web.Controllers
 		[Authorize]
 		public IActionResult Mine()
 		{
-			var userHouses = new List<HouseServiceModel>();
-			string userId = User.Id();
-			bool isAgent = agentService.ExistsById(userId);
+			if (User.IsInRole(AdminRoleName))
+				return RedirectToAction("Mine", "Houses", new { area = "Admin" });
 
-			if (isAgent)
+			string userId = User.Id();
+
+			if (agentService.ExistsById(userId))
 			{
 				int agentId = agentService.GetAgentId(userId);
-				userHouses.AddRange(houseService.AllHousesByAgentId(agentId));
+				return View(houseService.AllHousesByAgentId(agentId));
 			}
 
-			if (!isAgent || User.IsAdmin())
-			{
-				int[] addedHousesIds = userHouses.Select(h => h.Id).ToArray();
-
-				userHouses.AddRange(houseService.AllHousesByUserId(userId)
-					.Where(h => !addedHousesIds.Contains(h.Id)));
-			}
-
-			return View(userHouses);
+			return View(houseService.AllHousesByUserId(userId));
 		}
 
 		[Authorize]
@@ -161,6 +161,8 @@ namespace HouseRentingSystem.Web.Controllers
 			houseService.Edit(id, model.Title, model.Address, model.Description,
 							  model.ImageUrl, model.PricePerMonth, model.CategoryId);
 
+			TempData["message"] = "You have sussessfully edited a house!";
+
 			return RedirectToAction(nameof(Details),
 				new { id, information = model.GetInformation() });
 		}
@@ -192,6 +194,8 @@ namespace HouseRentingSystem.Web.Controllers
 
 			houseService.Delete(model.Id);
 
+			TempData["message"] = "You have sussessfully deleted a house!";
+
 			return RedirectToAction(nameof(All));
 		}
 
@@ -211,6 +215,9 @@ namespace HouseRentingSystem.Web.Controllers
 				return BadRequest();
 
 			houseService.Rent(id, userId);
+			cache.Remove(RentsCacheKey);
+
+			TempData["message"] = "You have sussessfully rented a house!";
 
 			return RedirectToAction(nameof(Mine));
 		}
@@ -234,6 +241,9 @@ namespace HouseRentingSystem.Web.Controllers
 			}
 
 			houseService.Leave(id);
+			cache.Remove(RentsCacheKey);
+
+			TempData["message"] = "You have sussessfully left a house!";
 
 			return RedirectToAction(nameof(Mine));
 		}

@@ -6,22 +6,27 @@ using HouseRentingSystem.Services.Data.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Caching.Memory;
 using System.ComponentModel.DataAnnotations;
 using static HouseRentingSystem.Services.Data.DataConstants.User;
+using static HouseRentingSystem.Services.Data.DataConstants.AdminConstants;
 
 namespace HouseRentingSystem.Web.Areas.Identity.Pages.Account
 {
 	public class RegisterModel : PageModel
 	{
-		private readonly SignInManager<User> _signInManager;
-		private readonly UserManager<User> _userManager;
+		private readonly SignInManager<User> signInManager;
+		private readonly UserManager<User> userManager;
+		private readonly IMemoryCache cache;
 
 		public RegisterModel(
 			UserManager<User> userManager,
-			SignInManager<User> signInManager)
+			SignInManager<User> signInManager,
+			IMemoryCache cache)
 		{
-			_userManager = userManager;
-			_signInManager = signInManager;
+			this.userManager = userManager;
+			this.signInManager = signInManager;
+			this.cache = cache;
 		}
 
 		[BindProperty]
@@ -79,11 +84,12 @@ namespace HouseRentingSystem.Web.Areas.Identity.Pages.Account
 					LastName = Input.LastName
 				};
 
-				var result = await _userManager.CreateAsync(user, Input.Password);
+				var result = await userManager.CreateAsync(user, Input.Password);
 
 				if (result.Succeeded)
 				{
-					await _signInManager.SignInAsync(user, isPersistent: false);
+					cache.Remove(UsersCacheKey);
+					await signInManager.SignInAsync(user, isPersistent: false);
 					return LocalRedirect(returnUrl);
 				}
 
