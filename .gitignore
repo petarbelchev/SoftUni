@@ -47,6 +47,8 @@ Generated\ Files/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+.lutignore
+.lutconfig
 
 # Build Results of an ATL Project
 [Dd]ebugPS/
