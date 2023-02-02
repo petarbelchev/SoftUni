@@ -209,6 +209,58 @@ namespace HouseRentingSystem.Tests.UnitTests
 		}
 
 		[Test]
+		public void Delete_ShouldDeleteHouse()
+		{
+			//Arrange
+			string title = "TestHouse2";
+			string address = "TestAddress2";
+			string description = "TestDescription2";
+			string imageUrl = "TestUrl2";
+			decimal pricePerMonth = 15.00m;
+			int categoryId = 2;
+			int agentId = Agent.Id;
+
+			int houseId = houseService.Create(title, address, description, imageUrl,
+												pricePerMonth, categoryId, agentId);
+
+			//Act
+			int housesCountBeforeDelete = data.Houses.Count();
+			houseService.Delete(houseId);
+
+			//Assert
+			Assert.That(data.Houses.Count(), Is.EqualTo(housesCountBeforeDelete - 1));
+
+			var deletedHouse = data.Houses.Find(houseId);
+			Assert.That(deletedHouse, Is.Null);
+		}
+
+		[Test]
+		public void Edit_ShouldEditHouse()
+		{
+			//Arrange
+			string title = "TestHouse3";
+			string address = "TestAddress3";
+			string description = "TestDescription3";
+			string imageUrl = "TestUrl3";
+			decimal pricePerMonth = 20.00m;
+			int categoryId = 3;
+			int agentId = Agent.Id;
+
+			int houseId = houseService.Create(title, address, description, imageUrl,
+												pricePerMonth, categoryId, agentId);
+
+			//Act
+			string newTitle = "EditedTitle";
+			decimal newPrice = 25.00m;
+			houseService.Edit(houseId, newTitle, address, description, imageUrl, newPrice, categoryId);
+
+			//Assert
+			var house = data.Houses.First(h => h.Id == houseId);
+			Assert.That(house.Title, Is.EqualTo(newTitle));
+			Assert.That(house.PricePerMonth, Is.EqualTo(newPrice));
+		}
+
+		[Test]
 		public void Exists_ShouldReturnTrue_WithValidId()
 		{
 			//Arrange
@@ -218,6 +270,142 @@ namespace HouseRentingSystem.Tests.UnitTests
 
 			//Assert
 			Assert.That(result, Is.True);
+		}
+
+		[Test]
+		public void GetHouseCategoryId_ShouldReturnCorrectId()
+		{
+			//Arrange
+			int expectedId = RentedHouse.CategoryId;
+
+			//Act
+			int actualId = houseService.GetHouseCategoryId(RentedHouse.Id);
+
+			//Assert
+			Assert.That(actualId, Is.EqualTo(expectedId));
+		}
+
+		[Test]
+		public void HasAgentWithId_ShouldReturnTrue_WithValidId()
+		{
+			//Arrange
+
+			//Act
+			bool result = houseService.HasAgentWithId(RentedHouse.Id, Agent.UserId);
+
+			//Assert
+			Assert.That(result, Is.True);
+		}
+
+		[Test]
+		public void HasAgentWithId_ShouldReturnFalse_WithInvalidUserId()
+		{
+			//Arrange
+
+			//Act
+			bool result = houseService.HasAgentWithId(RentedHouse.Id, "NotExistId");
+
+			//Assert
+			Assert.That(result, Is.False);
+		}
+
+		[Test]
+		public void HasAgentWithId_ShouldReturnFalse_WithInvalidHouseId()
+		{
+			//Arrange
+
+			//Act
+			bool result = houseService.HasAgentWithId(-1, Agent.UserId);
+
+			//Assert
+			Assert.That(result, Is.False);
+		}
+
+		[Test]
+		public void HouseDetailsById_ShouldReturnCorrectData()
+		{
+			//Act
+			var house = houseService.HouseDetailsById(RentedHouse.Id);
+
+			//Assert
+			Assert.That(house.Id, Is.EqualTo(RentedHouse.Id));
+			Assert.That(house.Title, Is.EqualTo(RentedHouse.Title));
+			Assert.That(house.Description, Is.EqualTo(RentedHouse.Description));
+		}
+
+		[Test]
+		public void IsRented_ShouldReturnTrue_WithValidData()
+		{
+			//Act
+			bool response = houseService.IsRented(RentedHouse.Id);
+
+			//Assert
+			Assert.That(response, Is.True);
+		}
+
+		[Test]
+		public void IsRentedByUserWithId_ShouldReturnTrue_WithValidData()
+		{
+			//Act
+			bool response = houseService.IsRentedByUserWithId(RentedHouse.Id, Renter.Id);
+
+			//Assert
+			Assert.That(response, Is.True);
+		}
+
+		[Test]
+		public void LastThreeHouses_ShouldReturnCorrectData()
+		{
+			//Arrange
+			var lastThreeHouses = new List<House>();
+			for (int i = 1; i <= 3; i++)
+			{
+				lastThreeHouses.Add(new House
+				{
+					Title = "Title" + i,
+					Address = "Address" + i,
+					Description = "Description" + i,
+					ImageUrl = "ImageUrl" + i,
+					Agent = Agent,
+					Renter = Renter,
+					Category = new Category() { Name = "TestCategory" }
+				});
+			}
+			data.Houses.AddRange(lastThreeHouses);
+			data.SaveChanges();
+
+			lastThreeHouses.Reverse();
+
+			//Act
+			var actualHouses = houseService.LastThreeHouses();
+
+			//Assert
+			Assert.That(actualHouses, Is.Not.Null);
+			Assert.That(actualHouses.Count(), Is.EqualTo(lastThreeHouses.Count()));
+			for (int i = 0; i < actualHouses.Count(); i++)
+			{
+				Assert.That(actualHouses.ElementAt(i).Id, Is.EqualTo(lastThreeHouses.ElementAt(i).Id));
+				Assert.That(actualHouses.ElementAt(i).Title, Is.EqualTo(lastThreeHouses.ElementAt(i).Title));
+				Assert.That(actualHouses.ElementAt(i).Address, Is.EqualTo(lastThreeHouses.ElementAt(i).Address));
+			}
+		}
+
+		[Test]
+		public void RentAndLeave_ShouldWorkCorrectly()
+		{
+			//Arrange
+			
+			//Act
+			houseService.Leave(RentedHouse.Id);
+
+			//Assert that house is lefted
+			Assert.That(RentedHouse.RenterId, Is.Null);
+
+			//Act
+			houseService.Rent(RentedHouse.Id, Renter.Id);
+
+			//Assert that house is created and rented
+			Assert.That(RentedHouse.RenterId, Is.EqualTo(Renter.Id));
 		}
 	}
 }

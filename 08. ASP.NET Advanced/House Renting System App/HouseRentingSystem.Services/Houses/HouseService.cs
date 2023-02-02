@@ -139,10 +139,7 @@ namespace HouseRentingSystem.Services.Houses
 
         public void Edit(int houseId, string title, string address, string description, string imageUrl, decimal price, int categoryId)
         {
-            House? house = data.Houses.Find(houseId);
-
-            if (house == null)
-                throw new ArgumentNullException("House does not exist.");
+            House house = data.Houses.First(h => h.Id == houseId);
 
             house.Title = title;
             house.Address = address;
@@ -222,10 +219,7 @@ namespace HouseRentingSystem.Services.Houses
 
         public void Leave(int houseId)
         {
-            var house = data.Houses.Find(houseId);
-
-            if (house == null)
-                throw new ArgumentNullException("House does not exist.");
+            var house = data.Houses.First(h => h.Id == houseId);
 
             house.RenterId = null;
 
@@ -234,10 +228,7 @@ namespace HouseRentingSystem.Services.Houses
 
         public void Rent(int houseId, string userId)
         {
-            var house = data.Houses.Find(houseId);
-
-            if (house == null)
-                throw new ArgumentNullException("House does not exist.");
+            var house = data.Houses.First(h => h.Id == houseId);
 
             house.RenterId = userId;
 
