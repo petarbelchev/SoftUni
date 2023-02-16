@@ -82,21 +82,31 @@ WHERE StatusId = 4
 
 -- 05.
 
-SELECT Description, FORMAT(OpenDate, 'dd-MM-yyyy')
+SELECT 
+	Description, 
+	FORMAT(OpenDate, 'dd-MM-yyyy')
 FROM Reports 
 WHERE EmployeeId IS NULL
-ORDER BY OpenDate, Description
+ORDER BY 
+	OpenDate, 
+	Description
 
 -- 06.
 
-SELECT r.Description, ca.Name AS CategoryName
+SELECT 
+	r.Description, 
+	ca.Name AS CategoryName
 FROM Reports AS r 
 JOIN Categories AS ca ON ca.Id = r.CategoryId
-ORDER BY r.Description, ca.Name
+ORDER BY 
+	r.Description, 
+	ca.Name
 
 -- 07.
 
-SELECT c.Name AS CategoryName, COUNT(*) AS ReportsNumber
+SELECT TOP 5 
+	c.Name AS CategoryName, 
+	COUNT(*) AS ReportsNumber
 FROM Categories AS c 
 JOIN Reports AS r ON r.CategoryId = c.Id
 GROUP BY c.Name
@@ -104,25 +114,35 @@ ORDER BY ReportsNumber DESC
 
 -- 08.
 
-SELECT u.Username, c.Name AS CategoryName
+SELECT 
+	u.Username, 
+	c.Name AS CategoryName
 FROM Users AS u 
 JOIN Reports AS r ON r.UserId = u.Id
 JOIN Categories AS c ON c.Id = r.CategoryId
 WHERE 
     DATEPART(DAY, u.BirthDate) = DATEPART(DAY, r.OpenDate) AND
     DATEPART(MONTH, u.BirthDate) = DATEPART(MONTH, r.OpenDate)
-ORDER BY u.Username, CategoryName
+ORDER BY 
+	u.Username, 
+	CategoryName
 
 -- 09.
 
-SELECT dt.FullName, COUNT(*) AS UsersCount
+SELECT 
+	dt.FullName
+	,COUNT(dt.UserId) AS UsersCount
 FROM (
-    SELECT CONCAT(e.FirstName, ' ', e.LastName) AS FullName, r.UserId
+    SELECT 
+		CONCAT(e.FirstName, ' ', e.LastName) AS FullName
+		,r.UserId
     FROM Employees AS e 
-    JOIN Reports AS r ON r.EmployeeId = e.Id
+    LEFT JOIN Reports AS r ON r.EmployeeId = e.Id
 ) AS dt
 GROUP BY dt.FullName
-ORDER BY UsersCount DESC, dt.FullName
+ORDER BY 
+	UsersCount DESC, 
+	dt.FullName
 
 -- 10.
 
@@ -130,13 +150,16 @@ SELECT
     CASE 
         WHEN e.FirstName IS NULL AND e.LastName IS NULL THEN 'None'
         ELSE CONCAT(e.FirstName, ' ', e.LastName)
-        END AS FullName,
-    d.Name AS Department,
-    c.Name AS Category,
-    r.Description,
-    FORMAT(r.OpenDate, 'dd.MM.yyyy'),
-    s.Label AS [Status],
-    u.Name AS [User]
+        END AS Employee,
+    CASE 
+		WHEN d.[Name] IS NULL THEN 'None'
+		ELSE d.[Name]
+		END AS Department,
+    c.[Name] AS Category,
+    r.[Description],
+    FORMAT(r.OpenDate, 'dd.MM.yyyy') AS OpenDate,
+    s.[Label] AS [Status],
+    u.[Name] AS [User]
 FROM Reports AS r 
 LEFT JOIN Employees AS e ON e.Id = r.EmployeeId
 LEFT JOIN Departments AS d ON d.Id = e.DepartmentId
@@ -146,18 +169,18 @@ JOIN Users AS u on u.Id = r.UserId
 ORDER BY
     e.FirstName DESC,
     e.LastName DESC,
-    d.Name,
-    c.Name,
-    r.Description,
+    d.[Name],
+    c.[Name],
+    r.[Description],
     r.OpenDate,
-    s.Label,
-    u.Name
+    s.[Label],
+    u.[Name]
 
 -- 11.
 
 GO
 
-CREATE OR ALTER FUNCTION udf_HoursToComplete(@StartDate DATETIME, @EndDate DATETIME)
+CREATE FUNCTION udf_HoursToComplete(@StartDate DATETIME, @EndDate DATETIME)
 RETURNS INT AS
 BEGIN
     IF(@StartDate IS NULL OR @EndDate IS NULL)
@@ -175,7 +198,7 @@ FROM Reports
 
 GO
 
-CREATE OR ALTER PROC usp_AssignEmployeeToReport(@EmployeeId INT, @ReportId INT) AS
+CREATE PROC usp_AssignEmployeeToReport(@EmployeeId INT, @ReportId INT) AS
     DECLARE @EmpDepId INT = (
         SELECT DepartmentId
         FROM Employees
